@@ -336,6 +336,104 @@ InstallMethod(Intersection2, [IsIdealOfAffineSemigroup, IsIdealOfAffineSemigroup
 end);
 
 
+
+
+
+#############################################################################
+##
+#F SubtractPrincipalIdealsOfAffineSemigroup(I,J)
+##
+## returns the ideal I-J of the principal ideals I and J (in the same ambient affine semigroup)
+#############################################################################
+InstallMethod(SubtractPrincipalIdealsOfAffineSemigroup,[IsIdealOfAffineSemigroup,IsIdealOfAffineSemigroup],1,function(I,J)
+    local i, j, S, l, n, A, A2, P, X, Y, res, le, v;
+    
+    if not (Length(MinimalGenerators(I))=1 and Length(MinimalGenerators(J))=1)
+    or not AmbientAffineSemigroupOfIdeal(I) = AmbientAffineSemigroupOfIdeal(J) then
+        Error("The arguments must be principal ideals of the same affine semigroup.");
+    fi;
+
+    i := MinimalGenerators(I)[1];
+    j := MinimalGenerators(J)[1];
+    S := AmbientAffineSemigroupOfIdeal(I);
+    l := MinimalGenerators(S);
+    n := Length(l);
+    A := TransposedMat(l);
+    A2 := TransposedMat(Concatenation(l,-l,[j-i]));
+    P := Filtered(HilbertBasisOfSystemOfHomogeneousEquations(A2,[]),l->l[2*n+1]=1);
+    if Length(P) = 0 then
+        return Set([]);
+    fi;
+    
+    X := P{[1..Length(P)]}{[1..n]};
+    Y := P{[1..Length(P)]}{[n+1..2*n]};
+    res := [];
+    le := Length(X);
+    for v in [1..le] do
+        Append(res,[A*X[v]-A*Y[v]]);
+    od;
+    return IdealOfAffineSemigroup(res, S);
+end);
+
+
+#############################################################################
+##
+#F SubtractIdealsOfAffineSemigroup(I,J)
+##
+## returns the ideal I-J of the ideals I and J (in the same ambient affine semigroup)
+#############################################################################
+
+InstallGlobalFunction(SubtractIdealsOfAffineSemigroup, function(I,J)
+    local S, l1, l2, j, resj, i, resi, geni, genj, ngen, x, res;
+    
+    if not (IsIdealOfAffineSemigroup(I) and IsIdealOfAffineSemigroup(J))
+       or not AmbientAffineSemigroupOfIdeal(I)
+       = AmbientAffineSemigroupOfIdeal(J) then
+        Error("The arguments must be ideals of the same affine semigroup.");
+    fi;
+
+    S := AmbientAffineSemigroupOfIdeal(I);
+    l1 := MinimalGenerators(I);
+    l2 := MinimalGenerators(J);
+    for j in l2 do
+        resj := []+S;
+        genj := [];
+        for i in l1 do
+            resi := SubtractPrincipalIdealsOfAffineSemigroup(i+S, j+S);
+            geni := Generators(resi);
+            ngen := [];
+            for x in geni do
+                if not \in(x,genj) then
+                    Add(ngen,x);
+                fi;
+            od;
+            resj := UnionIdealsOfAffineSemigroup(resj, ngen + S);
+            genj := Generators(resj);
+        od;
+        if j <> l2[1] then
+            res := IntersectionIdealsOfAffineSemigroup(res, resj);
+        else
+            res := resj;
+        fi;
+    od;
+
+    return res;
+end);
+
+
+
+###########################################################
+## I - J means SubtractIdealsOfAffineSemigroup(I,J)
+###########################################################
+
+InstallOtherMethod( \-,
+    "for ideals of the same Affine semigroup", true,
+    [IsIdealOfAffineSemigroup, IsIdealOfAffineSemigroup], function(I,J)
+    return SubtractIdealsOfAffineSemigroup(I,J);
+end);
+
+
+
 #############################################################################
 ##
 #F  BelongsToIdealOfAffineSemigroup(n,I)
@@ -494,13 +592,13 @@ end);
 
 #############################################################################
 ##
-#O  MaximalIdealOfNumericalSemigroup(S)
+#O  MaximalIdealOfAffineSemigroup(S)
 ##
 ##  Returns the maximal ideal of S.
 ##
 #############################################################################
 InstallMethod(MaximalIdeal,
-    "of a numerical semigroup",
+    "of an affine semigroup",
     [IsAffineSemigroup],
     function(S)
         return MinimalGenerators(S)+S;

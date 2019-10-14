@@ -5,8 +5,8 @@
 #W                          Helena Martin Cruz <Helena.mc18@gmail.com>
 ##
 ##
-#Y  Copyright 2005 by Manuel Delgado,
-#Y  Pedro Garcia-Sanchez and Helena Marting Cruz
+#Y  Copyright 2019 by Manuel Delgado,
+#Y  Pedro Garcia-Sanchez and Helena Martin Cruz
 #Y  We adopt the copyright regulations of GAP as detailed in the
 #Y  copyright notice in the GAP manual.
 ##
@@ -122,8 +122,21 @@ DeclareOperation("IntersectionPrincipalIdealsOfAffineSemigroup",[IsIdealOfAffine
 DeclareGlobalFunction("IntersectionIdealsOfAffineSemigroup");
 
 
+#############################################################################
+##
+#F SubtractPrincipalIdealsOfAffineSemigroup(I,J)
+##
+## returns the ideal I-J of the principal ideals I and J (in the same ambient affine semigroup)
+#############################################################################
+DeclareOperation("SubtractPrincipalIdealsOfAffineSemigroup",[IsIdealOfAffineSemigroup,IsIdealOfAffineSemigroup]);
 
-
+#############################################################################
+##
+#F SubtractIdealsOfAffineSemigroup(I,J)
+##
+## returns the ideal I-J of the ideals I and J (in the same ambient affine semigroup)
+#############################################################################
+DeclareGlobalFunction("SubtractIdealsOfAffineSemigroup");
 
 #############################################################################
 ##
@@ -171,9 +184,9 @@ DeclareGlobalFunction("TranslationOfIdealOfAffineSemigroup");
 
 #############################################################################
 ##
-#O  MaximalIdealOfNumericalSemigroup(S)
+#O  MaximalIdealOfAffineSemigroup(S)
 ##
-##  Returns the maximal ideal of S.
+##  Returns the maximal ideal of the affine semigroup S.
 ##
 #############################################################################
 DeclareOperation("MaximalIdeal",[IsAffineSemigroup]);
